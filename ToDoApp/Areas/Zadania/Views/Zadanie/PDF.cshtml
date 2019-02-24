@@ -1,0 +1,61 @@
+﻿@model IEnumerable<ToDoApp.Areas.Zadania.Models.ToDoModel>
+
+@{ Layout = null;
+}
+<table class="table">
+	<tr>
+		<td>
+			@Html.DisplayNameFor(model => model.Temat)
+		</td>
+		<td>
+			@Html.DisplayNameFor(model => model.Czynnosc)
+		</td>
+		<td>
+			@Html.DisplayNameFor(model => model.Opis)
+		</td>
+		<td>
+			@Html.DisplayNameFor(model => model.Status)
+		</td>
+		<td>
+			@Html.DisplayNameFor(model => model.Priorytet)
+		</td>
+		<td>
+			@Html.DisplayNameFor(model => model.ProcentZakonczenia)
+		</td>
+		<td>
+			@Html.DisplayNameFor(model => model.DataRozpoczecia)
+		</td>
+		<td>
+			@Html.DisplayNameFor(model => model.DataZakonczenia)
+		</td>
+	</tr>
+	@foreach (var item in Model)
+	{
+		<tr>
+			<td>
+				@Html.DisplayFor(modelItem => item.Temat)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.Czynnosc)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.Opis)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.Status)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.Priorytet)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.ProcentZakonczenia)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.DataRozpoczecia)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.DataZakonczenia)
+			</td>
+		</tr>
+	}
+</table>

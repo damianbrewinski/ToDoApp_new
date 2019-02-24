@@ -1,0 +1,224 @@
+﻿@model PagedList.IPagedList<ToDoApp.Areas.Zadania.Models.ToDoModel>
+@using PagedList.Mvc;
+
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+
+<div id='myModal' class='modal fade'>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div id='myModalContent'></div>
+		</div>
+	</div>
+</div>
+<div id="dialog-edit" style="display: none">
+</div>
+<p>
+	<button class="btn btn-primary-row" type="button" id="btnCreate" href="@Url.Action("Create", "Zadanie")">Dodaj</button>
+	<button class="btn btn-primary-row" type="button" id="btnEdit" href="@Url.Action("Edit", "Zadanie")">Edytuj</button>
+	<input type="button" class="btn btn-primary-row" value="Change view" onclick="window.location.href='@Url.Action("Tiles", "Zadanie")'" />
+</p>
+<div class="dropdown float-right">
+	<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		Eksportuj do...
+	</button>
+	<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+		<a class="dropdown-item excel-row" href="#">pliku Excel</a>
+		<a class="dropdown-item pdf-row" href="#">pliku PDF</a>
+	</div>
+</div>
+@using (Html.BeginForm("Listing", "Zadanie", FormMethod.Get))
+{
+	<div class="d-flex">
+		@Html.TextBox("Temat", null, new { @class = "form-control-row", @placeholder = "Temat" })
+		@Html.TextBox("Czynność", null, new { @class = "form-control=row", @placeholder = "Czynność" })
+		@Html.Editor("DataRozpoczecia", new { htmlAttributes = new { @class = "form-control-row", @type = "date", @placeholder = "Data rozpoczęcia" } })
+		@Html.Editor("DataZakonczenia", new { htmlAttributes = new { @class = "form-control-row", @type = "date", @placeholder = "Data zakończenia" } })
+	</div>
+	<div class="d-flex">
+		@Html.TextBox("Priorytet", null, new { @class = "form-control-row", @type = "number", @placeholder = "Priorytet" })
+		@Html.TextBox("ProcentZakonczenia", null, new { @class = "form-control-row", @type = "number", @placeholder = "Procent zakończenia" })
+		@Html.TextBox("Status", null, new { @class = "form-control-row", @type = "number", @placeholder = "Status" })
+		<div class="p-2">
+			<input type="submit" class="btn btn-primary-row" value="Search" />
+			<button class="btn btn-primary-row" onclick="location.href='@Url.Action("Reset", "Listing", "Zadania/Zadanie")';return false;">Reset</button>
+		</div>
+	</div>
+}
+
+<table class="table">
+	<tr>
+		
+		<th>
+
+			@Html.ActionLink("Temat", "Listing", new { sortOrder = ViewBag.TematSortParam, currentFilter = ViewBag.CurrentFilter }, null)
+		</th>
+		<th>
+
+			@Html.ActionLink("Czynność", "Listing", new { sortOrder = ViewBag.CzynnoscSortParam, currentFilter = ViewBag.CurrentFilter })
+		</th>
+		<th>
+
+			@Html.ActionLink("Opis", "Listing", new { sortOrder = ViewBag.OpisSortParam, currentFilter = ViewBag.CurrentFilter })
+		</th>
+		<th>
+
+			@Html.ActionLink("Status", "Listing", new { sortOrder = ViewBag.StatusParam, currentFilter = ViewBag.CurrentFilter })
+		</th>
+		<th>
+
+			@Html.ActionLink("Priorytet", "Listing", new { sortOrder = ViewBag.PriorytetSortParam, currentFilter = ViewBag.CurrentFilter })
+		</th>
+		<th>
+
+			@Html.ActionLink("Procent Zakończenia", "Listing", new { sortOrder = ViewBag.ProcentZakonczeniaSortParam, currentFilter = ViewBag.CurrentFilter })
+		</th>
+		<th>
+
+			@Html.ActionLink("Data Rozpoczecia", "Listing", new { sortOrder = ViewBag.DataRozpoczeciaSortParam, currentFilter = ViewBag.CurrentFilter })
+		</th>
+		<th>
+
+			@Html.ActionLink("Data Zakonczenia", "Listing", new { sortOrder = ViewBag.DataZakonczeniaSortParam, currentFilter = ViewBag.CurrentFilter })
+		</th>
+		<th></th>
+	</tr>
+	@foreach (var item in Model)
+	{
+		<tr>
+			<!--<td>
+				@Html.DisplayFor(modelItem => item.Identifier)
+			</td>-->
+			<td>
+				@Html.DisplayFor(modelItem => item.Temat)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.Czynnosc)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.Opis)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.Status)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.Priorytet)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.ProcentZakonczenia)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.DataRozpoczecia)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.DataZakonczenia)
+			</td>
+			<td>
+				<input type="checkbox" class="form-check-input" value="@item.Identifier" id="@Html.DisplayFor(modelItem => item.Identifier)">
+			</td>
+			<td>
+				@Html.ActionLink("Edit", "Edit", new { id = item.Identifier }, new { @class = "lnkEdit" }) |
+				@Html.ActionLink("Details", "Details", new { id = item.Identifier }, new { @class = "lnkDetails" }) |
+				@Html.ActionLink("Delete", "Delete", new { id = item.Identifier }, new { onclick = "return confirm('Na pewno chesz usunac?')" })
+			</td>
+		</tr>
+	}
+</table>
+@using (Html.BeginForm("Listing", "Zadanie", FormMethod.Get, new { id = "form1" }))
+{
+	<div id='Paging'>
+		<p class="float-right">
+			Ilość rekordów: @Html.DropDownList("pageSize")
+		</p>
+		<br />
+		Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)
+		of @Model.PageCount
+		@Html.PagedListPager(Model, page => Url.Action("Listing", new { page, pageSize = ViewBag.psize, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+	</div>
+}
+
+<script type="text/javascript">
+	$(document).ready(function () {
+
+
+		$("#pageSize").change(function () {
+			$("#form1").submit();
+		});
+
+		$("#dialog-edit").dialog({
+			title: 'Edytuj zadanie',
+			autoOpen: false,
+			resizable: false,
+			width: 600,
+			show: { effect: 'drop', direction: "top" },
+			modal: true,
+			draggable: true,
+			open: function (event, ui) {
+				$(".ui-dialog-titlebar-close").hide();
+				$(this).load(url);
+			}
+		});
+
+		$(".lnkEdit").click(function (e) {
+			e.preventDefault();
+			url = $(this).attr('href');
+			$(".ui-dialog-title").html("Aktualizuj zadanie");
+			$("#dialog-edit").dialog('open');
+		});
+
+
+		$('#btnEdit').click(function (e) {
+			e.preventDefault();
+			var checkedValues = [], checkedBox = $(".table").find("input:checkbox:checked");
+			checkedBox.each(function (index) {
+				checkedValues.push(this.value);
+			});
+			if (checkedValues.length == 0) {
+				toastr.warning('Wybierz zadanie do edycji');
+			}
+			else if (checkedValues.length > 1) {
+				toastr.warning('Możesz zaznaczyć tylko jeden element');
+			}
+			else {
+				url = $(this).attr('href') + "/" + checkedValues[0];
+				$(".ui-dialog-title").html("Aktualizuj zadanie");
+				$("#dialog-edit").dialog('open');
+			}
+		});
+		$(".lnkDetails").click(function () {
+			var $buttonClicked = $(this);
+			var id = $buttonClicked.attr('data-id');
+			var url = $buttonClicked.attr('name');
+			var options = { "backdrop": "static", keyboard: true };
+			$.ajax({
+				type: "GET",
+				url: url,
+				contentType: "application/json; charset=utf-8",
+				data: { "Id": id },
+				datatype: "json",
+				success: function (data) {
+					$('#myModalContent').html(data);
+					$('#myModal').modal(options);
+					$('#myModal').modal('show');
+				},
+				error: function () {
+					toastr.error('Something went wrong. Try again');
+				}
+			});
+		});
+	});
+	$("#btnCreate").click(function (e) {
+		e.preventDefault();
+		url = $(this).attr('href');
+		$(".ui-dialog-title").html("Dodaj zadanie");
+		$("#dialog-edit").dialog('open');
+	});
+	$("#closbtn").click(function () {
+		$('#myModal').modal('hide');
+	});
+	
+	
+
+
+</script>
