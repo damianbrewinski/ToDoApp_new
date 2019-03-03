@@ -11,6 +11,10 @@ using System.IO;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using ClosedXML.Excel;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using iTextSharp.text.html.simpleparser;
+using System.Text;
 
 namespace ToDoApp.Areas.Zadania.Controllers
 {
@@ -29,10 +33,10 @@ namespace ToDoApp.Areas.Zadania.Controllers
         public ActionResult Index()
         {
             return RedirectToAction("Listing");
-         
+
         }
 
-        public ActionResult Listing(string Temat, string Czynnosc,string Opis, string Status,string Priorytet, string ProcentZakonczenia, string DataRozpoczecia, string DataZakonczenia,string sortOrder, int?page, int pageSize = 10  )
+        public ActionResult Listing(string Temat, string Czynnosc, string Opis, string Status, string Priorytet, string ProcentZakonczenia, string DataRozpoczecia, string DataZakonczenia, string sortOrder, int? page, int pageSize = 10)
         {
 
 
@@ -274,7 +278,7 @@ namespace ToDoApp.Areas.Zadania.Controllers
 
             return RedirectToAction("Listing");
         }
-    public ActionResult Tiles(string Temat, string Czynnosc, string Opis, string Status, string Priorytet, string ProcentZakonczenia, string DataRozpoczecia, string DataZakonczenia, string sortOrder, int? page, int pageSize = 10)
+        public ActionResult Tiles(string Temat, string Czynnosc, string Opis, string Status, string Priorytet, string ProcentZakonczenia, string DataRozpoczecia, string DataZakonczenia, string sortOrder, int? page, int pageSize = 10)
         {
             var zadania = _zadanieRepository.GetAll();
 
@@ -336,27 +340,75 @@ namespace ToDoApp.Areas.Zadania.Controllers
             int pageNumber = page ?? 1;
             return View(zadania.OrderBy(s => s.Priorytet).ToPagedList(pageNumber, pageSize));
         }
-        public ActionResult ExportToExcel()
+        protected string RenderRazorViewToString(string viewName, object model)
         {
-            var gv = new GridView();
-            gv.DataSource = _zadanieRepository.GetAll();
-            gv.DataBind();
-            Response.ClearContent();
-            Response.Buffer = true;
-            Response.AddHeader("content-disposition", "attachment; filename=DemoExcel.xls");
-            Response.ContentType = "application/ms-excel";
-            Response.Charset = "";
-            StringWriter objStringWriter = new StringWriter();
-            HtmlTextWriter objHtmlTextWriter = new HtmlTextWriter(objStringWriter);
-            gv.RenderControl(objHtmlTextWriter);
-            Response.Output.Write(objStringWriter.ToString());
-            Response.Flush();
+            if (model != null)
+            {
+                ViewData.Model = model;
+            }
+            using (StringWriter sw = new StringWriter())
+            {
+                ViewEngineResult viewResult = ViewEngines.Engines.FindPartialView(ControllerContext, viewName);
+                ViewContext viewContext = new ViewContext(ControllerContext, viewResult.View, ViewData, TempData, sw);
+                viewResult.View.Render(viewContext, sw);
+                viewResult.ViewEngine.ReleaseView(ControllerContext, viewResult.View);
+
+                return sw.GetStringBuilder().ToString();
+            }
+        }
+        public void ExportToExcel()
+        {
+            string Filename = "Excel_" + DateTime.Now.ToString("dd_MM_yyy_hh_mm") + ".xls";
+            string FolderPath = HttpContext.Server.MapPath("/App_Data/");
+            string FilePath = System.IO.Path.Combine(FolderPath, Filename);
+
+            if (System.IO.File.Exists(FilePath))
+            {
+                System.IO.File.Delete(FilePath);
+            }
+            string HtmlResult = RenderRazorViewToString("~/Areas/Zadania/Views/Zadanie/ExportToExcel.cshtml", _zadanieRepository.GetAll());       
+            byte[] ExcelBytes = Encoding.ASCII.GetBytes(HtmlResult);           
+            using (Stream file = System.IO.File.OpenWrite(FilePath))
+            {
+                file.Write(ExcelBytes, 0, ExcelBytes.Length);
+            }
+
+            
+            Response.ContentType = "application/vnd.ms-excel";
+            Response.AddHeader("Content-Disposition", "attachment; filename=" + Path.GetFileName(Filename));
+            Response.WriteFile(FilePath);
             Response.End();
-            return View("Listing");
+            Response.Flush();
+        }
+
+        public EmptyResult ExportToPdf()
+        {
+            string Filename = "PDF_" + DateTime.Now.ToString("dd_MM_yyy_hh_mm") + ".pdf";
+
+            var document = new Document(PageSize.A4, 50, 50, 25, 25);
+
+            var output = new MemoryStream();
+            var writer = PdfWriter.GetInstance(document, output);
+
+            document.Open();
+
+            var html = RenderRazorViewToString("~/Areas/Zadania/Views/Zadanie/ExportToPDF.cshtml", _zadanieRepository.GetAll());
+
+            var worker = new HTMLWorker(document);
+
+            var stringReader = new StringReader(html);
+            worker.Parse(stringReader);
+
+            document.Close();
+
+            Response.ContentType = "application/pdf";
+            Response.AddHeader("Content-Disposition", "attachment; filename=" + Path.GetFileName(Filename));
+            Response.BinaryWrite(output.ToArray());
+
+            return new EmptyResult();
         }
 
 
 
-        
     }
 }
