@@ -5,10 +5,8 @@
 <head>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
-	<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
 	<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 	<link rel="stylesheet" href="/resources/demos/style.css">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 	<style>
@@ -46,10 +44,11 @@
 		@Html.TextBox("Status", null, new { @class = "form-control-row", @type = "number", @placeholder = "Status" })
 		
 	</div>
-<div class="p-2">
-	<input type="submit" class="btn btn-secondary" value="Search" />
-	<button class="btn btn-secondary" onclick="location.href='@Url.Action("Reset", "Listing", "Zadania/Zadanie")';return false;">Reset</button>
-</div>
+	<div class="p-2">
+		<input type="submit" class="btn btn-secondary" value="Search" />
+		@Html.ActionLink("Reset", "Listing", "Zadania/Zadanie", new { @class = "btn btn-secondary" })
+
+	</div>
 }
 <div class="dropdown float-right">
 	<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -139,7 +138,7 @@
 				</td>
 				<td>
 					@Html.ActionLink("Edit", "Edit", new { id = item.Identifier }, new { @class = "lnkEdit" }) |
-					@Html.ActionLink("Details", "Details", new { id = item.Identifier }, new { @class = "lnkDetails" }) |
+					<a href="javascript:void(0);" class="lnkDetails" name="/Zadania/Zadanie/Details" data-id="@item.Identifier">Szczegóły</a> |
 					@Html.ActionLink("Delete", "Delete", new { id = item.Identifier }, new { onclick = "return confirm('Na pewno chesz usunac?')" })|
 					<a href="#" class="up">Up</a>|
 					<a href="#" class="down">Down</a>
@@ -189,22 +188,22 @@
 			});
 
 
-			$("#btnEdit").click(function (e) {
+			$('#btnEdit').click(function (e) {
 				e.preventDefault();
-				var cV = [], checkedBox = $(".table").find("input:checkbox:checked");
+				var checkedValues = [], checkedBox = $(".table").find("input:checkbox:checked");
 				checkedBox.each(function (index) {
-					cV.push(this.value);
+					checkedValues.push(this.value);
 				});
-				if (cV.length == 0) {
-					toastr.warning("Które zadanie edytować");
+				if (checkedValues.length == 0) {
+					toastr.warning('Wybierz zadanie do edycji');
 				}
-				else if (cV.length > 1) {
-					toastr.warning("Zaznacz jeden element");
+				else if (checkedValues.length > 1) {
+					toastr.warning('Zaznacz jedno zadanie');
 				}
 				else {
-					url = $(this).attr("href") + "/" + cV[0];
+					url = $(this).attr('href') + "/" + checkedValues[0];
 					$(".ui-dialog-title").html("Edytuj zadanie");
-					$("#dialog-edit").dialog("open");
+					$("#dialog-edit").dialog('open');
 				}
 			});
 

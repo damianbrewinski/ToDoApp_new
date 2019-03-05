@@ -15,14 +15,8 @@
 <div class="modal-body">
     
     <hr />
-    <dl class="dl-horizontal">
-        @*<dt>
-            @Html.DisplayNameFor(model => model.Identifier)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Identifier)
-        </dd>*@
+    <dl class="modal-body">
+        
 
         <dt>
             @Html.DisplayNameFor(model => model.Temat)
@@ -91,6 +85,8 @@
     </dl>
 </div>
 <p>
-    @*@Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |*@
-    @Html.ActionLink("Back to List", "Tiles")
+	@*@Html.ActionLink("Back to List", "Tiles")*@
+	<div class="modal-footer">
+	<button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+	</div>
 </p>

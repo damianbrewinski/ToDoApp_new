@@ -22,12 +22,12 @@ namespace ToDoApp.Areas.Zadania.Models
         public int Priorytet { get; set; }
         [Required]
         [Display(Name ="Procent zakończenia")]
-        public int ProcentZakonczenia { get; set; } 
-        
+        public int ProcentZakonczenia { get; set; }
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Required, Display(Name = "Data rozpoczęcia"), DataType(DataType.Date)]
         public DateTime DataRozpoczecia { get; set; }
         [Required, Display(Name = "Data zakończenia"), DataType(DataType.Date)]
-        
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime DataZakonczenia { get; set; }
     }
 }
